@@ -1,4 +1,3 @@
-import Joi from "joi";
 import {
   listContacts,
   getContactById,
@@ -8,12 +7,7 @@ import {
 } from "../models/contacts.js";
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decoratos/index.js";
-
-const contactsAddSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-});
+import { contactsAddSchema } from "../validation/contacts-schemas.js";
 
 const getAll = async (req, res) => {
   const result = await listContacts();
