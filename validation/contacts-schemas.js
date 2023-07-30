@@ -8,3 +8,7 @@ export const contactsAddSchema = Joi.object({
     .messages({ "string.pattern.base": `Phone number must have 10 digits.` })
     .required(),
 });
+
+export const contactUpdateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
