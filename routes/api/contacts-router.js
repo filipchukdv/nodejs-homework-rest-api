@@ -9,8 +9,12 @@ router.get("/:contactId", isValidId, contactsController.getById);
 
 router.post("/", contactsController.add);
 
-router.delete("/:contactId", contactsController.removeById);
+router.delete("/:contactId", isValidId, contactsController.removeById);
 
-router.put("/:contactId", contactsController.updateById);
+router.put("/:contactId", isValidId, contactsController.updateById);
 
-router.patch("/:contactId/favorite", contactsController.updateFavorite);
+router.patch(
+  "/:contactId/favorite",
+  isValidId,
+  contactsController.updateFavorite
+);
