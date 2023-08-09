@@ -13,3 +13,6 @@ export const contactsAddSchema = Joi.object({
 export const contactUpdateFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
+export const contactUpdateSubscriptionSchema = Joi.object({
+  subscription: Joi.required().valid("starter", "pro", "business"),
+});
