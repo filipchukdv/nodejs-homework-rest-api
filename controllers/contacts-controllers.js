@@ -1,11 +1,5 @@
 import Contact from "../models/contact.js";
-import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decoratos/index.js";
-import {
-  contactsAddSchema,
-  contactUpdateFavoriteSchema,
-  contactUpdateSubscriptionSchema,
-} from "../validation/contacts-schemas.js";
 
 const getAll = async (req, res) => {
   const { _id: owner } = req.user;
@@ -29,10 +23,6 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const { error } = contactsAddSchema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
   const { _id: owner } = req.user;
   const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
@@ -45,10 +35,6 @@ const removeById = async (req, res) => {
 };
 
 const updateById = async (req, res) => {
-  const { error } = contactsAddSchema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
   const { contactId } = req.params;
   const result = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
@@ -57,10 +43,6 @@ const updateById = async (req, res) => {
 };
 
 const updateFavorite = async (req, res) => {
-  const { error } = contactUpdateFavoriteSchema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
   const { contactId } = req.params;
   const result = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
