@@ -44,7 +44,10 @@ const login = async (req, res) => {
   const payload = { id: user._id };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1y" });
   await User.findByIdAndUpdate(user._id, { token });
-  res.json({ token });
+  res.json({
+    token,
+    user: { email: user.email, subscription: user.subscription },
+  });
 };
 
 const getCurrent = (req, res) => {
