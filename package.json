@@ -11,6 +11,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@elasticemail/elasticemail-client": "^4.0.23",
     "bcryptjs": "^2.4.3",
     "cors": "2.8.5",
     "dotenv": "^16.3.1",

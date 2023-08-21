@@ -8,6 +8,9 @@ import gravatar from "gravatar";
 import Jimp from "jimp";
 import fs from "fs/promises";
 import path from "path";
+import { nanoid } from "nanoid";
+import { sendVerificationEmail } from "../helpers/emailVerification.js";
+import { log } from "console";
 
 const { JWT_SECRET } = process.env;
 const avatarPath = path.resolve("public", "avatars");
@@ -24,11 +27,14 @@ const signup = async (req, res) => {
     protocol: "https",
     d: "monsterid",
   });
+  const verificationCode = nanoid();
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationCode,
   });
+  sendVerificationEmail(email, verificationCode);
   res.status(201).json({ email: newUser.email });
 };
 const login = async (req, res) => {
@@ -37,6 +43,10 @@ const login = async (req, res) => {
   if (!user) {
     throw HttpError(401, "Email or password is invalid");
   }
+  if (!user.verified) {
+    throw HttpError(401, "User in not verified");
+  }
+
   const comparePassword = await bcrypt.compare(password, user.password);
   if (!comparePassword) {
     throw HttpError(401, "Email or password is invalid");
@@ -86,6 +96,34 @@ const updateAvatar = async (req, res) => {
   res.json(result);
 };
 
+const verify = async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await User.findOne({ verificationCode });
+  console.log(user);
+  if (!user) {
+    throw HttpError(404, "User is not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verificationCode: null,
+    verified: true,
+  });
+  res.json({ message: "Verified successfully" });
+};
+
+const resendVerifyCode = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw HttpError(404, "User is not found");
+  }
+  if (user.verified) {
+    throw HttpError(400, "Verification has already been passed");
+  }
+
+  sendVerificationEmail(email, user.verificationCode);
+  res.json({ message: "Verification email sent" });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   login: ctrlWrapper(login),
@@ -93,4 +131,6 @@ export default {
   logout: ctrlWrapper(logout),
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
+  verify: ctrlWrapper(verify),
+  resendVerifyCode: ctrlWrapper(resendVerifyCode),
 };
